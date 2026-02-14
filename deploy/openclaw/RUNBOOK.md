@@ -5,6 +5,51 @@
 - OpenClaw core repo remains unchanged.
 - Deploy via out-of-tree plugin + runtime configuration only.
 
+## Backup First (Required)
+
+Before any rollout step, snapshot current OpenClaw runtime setup.
+
+```bash
+python scripts/backup_openclaw_runtime.py \
+  --path /etc/openclaw/config.toml \
+  --path /etc/openclaw/plugins.toml \
+  --path /etc/openclaw/rules.yaml \
+  --path /etc/openclaw/runtime.env \
+  --path /var/lib/openclaw \
+  --env-var EMAIL_TRIAGE_ENGINE \
+  --env-var EMAIL_TRIAGE_ARCHIVE_ENABLED \
+  --env-var EMAIL_TRIAGE_FAIL_OPEN \
+  --env-var EMAIL_TRIAGE_BLOCKLIST_ENABLED \
+  --env-var EMAIL_TRIAGE_LEGACY_RULES_ENABLED \
+  --output-dir /var/backups/openclaw-triage
+```
+
+Save the resulting `snapshot_dir` and `archive_path`.
+
+## Rollback From Backup
+
+Dry-run restore plan:
+
+```bash
+python scripts/restore_openclaw_runtime.py \
+  --snapshot-dir /var/backups/openclaw-triage/openclaw-runtime-backup-YYYYMMDDTHHMMSSZ \
+  --target-root / \
+  --write-env-file /etc/openclaw/restore-triage-env.sh
+```
+
+Apply restore:
+
+```bash
+python scripts/restore_openclaw_runtime.py \
+  --snapshot-dir /var/backups/openclaw-triage/openclaw-runtime-backup-YYYYMMDDTHHMMSSZ \
+  --target-root / \
+  --apply \
+  --write-env-file /etc/openclaw/restore-triage-env.sh
+
+source /etc/openclaw/restore-triage-env.sh
+# then reload/restart OpenClaw runtime using your standard ops command
+```
+
 ## Phase 0: Preflight
 
 1. Install plugin package in non-prod OpenClaw runtime.
@@ -34,7 +79,7 @@ python scripts/preflight_check.py \
 1. Disable legacy rules for canary slice.
 2. Start with `deploy/openclaw/canary.toml` (`canary_percent=5`).
 3. Increase to 25 after 24h if healthy.
-4. Evaluate rollback:
+4. Evaluate rollback trigger:
 
 ```bash
 python scripts/evaluate_rollback.py \
@@ -44,7 +89,7 @@ python scripts/evaluate_rollback.py \
   --write-env /etc/openclaw/email-triage-rollback.env
 ```
 
-If `rollback_triggered=true`, apply env overrides and reload runtime config.
+If `rollback_triggered=true`, load env overrides and reload runtime config.
 
 ## Phase 3: Full
 

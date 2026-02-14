@@ -9,6 +9,7 @@ Out-of-tree OpenClaw plugin for upgrade-safe email triage integration with the v
 - Strict OpenClaw version compatibility gate.
 - Shadow/canary/full rollout controls via config and env.
 - Fail-open behavior to keep inbox safe.
+- Explicit backup/restore scripts for rollback.
 
 ## Install (example)
 
@@ -49,6 +50,38 @@ export EMAIL_TRIAGE_ARCHIVE_ENABLED="true"
 export EMAIL_TRIAGE_FAIL_OPEN="true"
 export EMAIL_TRIAGE_BLOCKLIST_ENABLED="true"
 export EMAIL_TRIAGE_LEGACY_RULES_ENABLED="false"
+```
+
+## Backup and Restore
+
+Create a rollback snapshot before rollout:
+
+```bash
+python scripts/backup_openclaw_runtime.py \
+  --path /etc/openclaw/config.toml \
+  --path /etc/openclaw/plugins.toml \
+  --path /etc/openclaw/rules.yaml \
+  --path /etc/openclaw/runtime.env \
+  --path /var/lib/openclaw \
+  --output-dir /var/backups/openclaw-triage
+```
+
+Dry-run restore:
+
+```bash
+python scripts/restore_openclaw_runtime.py \
+  --snapshot-dir /var/backups/openclaw-triage/openclaw-runtime-backup-YYYYMMDDTHHMMSSZ \
+  --target-root /
+```
+
+Apply restore:
+
+```bash
+python scripts/restore_openclaw_runtime.py \
+  --snapshot-dir /var/backups/openclaw-triage/openclaw-runtime-backup-YYYYMMDDTHHMMSSZ \
+  --target-root / \
+  --apply \
+  --write-env-file /etc/openclaw/restore-triage-env.sh
 ```
 
 ## Command Contract
