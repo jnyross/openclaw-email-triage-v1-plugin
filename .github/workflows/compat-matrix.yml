@@ -1,0 +1,27 @@
+name: compat-matrix
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  plugin-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        openclaw_version: ["1.8.0", "1.9.0"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Test
+        env:
+          OPENCLAW_VERSION: ${{ matrix.openclaw_version }}
+        run: pytest -q

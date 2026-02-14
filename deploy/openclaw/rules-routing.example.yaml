@@ -1,0 +1,29 @@
+# Example runtime config snippet only.
+# Keep in infra/runtime config repo; do not patch OpenClaw source repo.
+
+email:
+  rules:
+    - id: triage_v1
+      enabled: true
+      when:
+        inbound: true
+      action:
+        type: plugin_command
+        name: email.triage.v1
+        payload:
+          request_id: "${event.request_id}"
+          message_id: "${email.message_id}"
+          thread_id: "${email.thread_id}"
+          sender: "${email.from}"
+          to: "${email.to}"
+          subject: "${email.subject}"
+          date: "${email.date}"
+          body_text: "${email.body_text}"
+          body_html: "${email.body_html}"
+          gmail_labels: "${email.labels}"
+          gmail_category: "${email.category}"
+          in_reply_to: "${email.in_reply_to}"
+          references: "${email.references}"
+          sent_message_ids: "${context.sent_message_ids}"
+          is_starred: "${email.is_starred}"
+          is_read: "${email.is_read}"

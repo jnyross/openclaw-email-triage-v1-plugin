@@ -1,0 +1,5 @@
+id = "email-triage-v1"
+name = "Email Triage v1"
+version = "0.1.0"
+entrypoint = "openclaw_email_triage_v1_plugin:register"
+supported_openclaw_versions = ">=1.8.0,<2.0.0"

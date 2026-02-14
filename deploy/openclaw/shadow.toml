@@ -1,0 +1,16 @@
+[plugins.entries.email_triage_v1]
+enabled = true
+package = "openclaw-email-triage-v1-plugin"
+
+[plugins.entries.email_triage_v1.config]
+inference_base_url = "https://triage.internal"
+inference_timeout_ms = 1500
+inference_retries = 2
+inference_backoff_ms = 200
+model_version = "v1"
+archive_confidence_threshold = 0.995
+supported_openclaw_versions = ">=1.8.0,<2.0.0"
+shadow_mode = true
+canary_percent = 0
+telemetry_jsonl_path = "/var/log/openclaw/email-triage-decisions.jsonl"
+idempotency_sqlite_path = "/var/lib/openclaw/email-triage-idempotency.sqlite3"

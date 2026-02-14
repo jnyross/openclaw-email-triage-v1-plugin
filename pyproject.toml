@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "openclaw-email-triage-v1-plugin"
+version = "0.1.0"
+description = "Out-of-tree OpenClaw plugin for v1 email triage"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.entry-points."openclaw.plugins"]
+email_triage_v1 = "openclaw_email_triage_v1_plugin:register"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/openclaw_email_triage_v1_plugin"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
